@@ -9,7 +9,7 @@ K_min = 2.5
 K_max = 20.0
 s0 = 6.89
 days = 2
-interval = 30*24
+interval = (30*24)/6.5
 T = days*interval
 
 fn, pl, return_distr = Model.return_distr(ticker, verbose=False)
