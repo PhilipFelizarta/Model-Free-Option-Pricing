@@ -1,6 +1,7 @@
 import numpy as np
 import yfinance as yf
 import matplotlib.pyplot as plt
+from scipy.special import erf
 
 
 def return_distr(ticker, verbose=True):
@@ -27,7 +28,7 @@ def return_distr(ticker, verbose=True):
 
 	fn = hist[0]/np.sum(hist[0])
 
-	return fn, pl
+	return fn, pl, daily_return
 
 
 def generate_s_matrix(s0, fn, pl, days=30, interval=30*24, num=1000):
@@ -58,4 +59,12 @@ def generate_p_x(s, T, res=1000):
 
 def call_price(p, X, K):
 	c = np.sum(np.where(X > K, (X - K)*p, 0))
+	return c
+
+
+def call_price_pless(s0, K, mu, sigma, T):
+	sigma_T = np.sqrt(T) * sigma
+	mu_T = T * mu + np.log(s0)
+
+	c = 0.5 * (np.exp(0.5*sigma_T**2  + mu_T)*(1 - erf((np.log(K) - sigma_T**2 - mu_T)/(np.sqrt(2)*sigma_T))) - K*(1 - erf((np.log(K) - mu_T)/(np.sqrt(2)*sigma_T))))
 	return c
