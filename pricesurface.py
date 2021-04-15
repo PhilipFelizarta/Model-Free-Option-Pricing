@@ -6,13 +6,13 @@ from mpl_toolkits.mplot3d import Axes3D
 
 import Model
 
-ticker = 'OCGN'
+ticker = 'SPY'
 
-K_min = 2.5 #Min Strike to analyze
-K_max = 20.0 #Max Strike
-s0 = 6.89 #Current Spot Price
-days = 2 #Days till expiration
-interval = (30*24)/6.5 #intervals per trading day (2m intervals for 6.5 hours)
+K_min = 500 #Min Strike to analyze
+K_max = 600 #Max Strike
+s0 = 411.87 #Current Spot Price
+days = 200 #Days till expiration
+interval = (30*6.5)#intervals per trading day (2m intervals for 6.5 hours)
 T = days*interval #Calculate how many intervals of return till expiration
 
 #Obtain return distribution aka r(x)
@@ -42,8 +42,40 @@ plt.clf()
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 ax.plot_surface(x, y, c)
+ax.set_title(ticker)
+ax.set_ylabel('$K$')
+ax.set_xlabel('$t$')
+ax.set_zlabel('Price')
 plt.show()
 
-print(Model.call_price_pless(s0, 10.0, mu, sigma, T))
+
+
+#Create Surface
+c = np.zeros((100,100))
+
+for i in range(100): #Volatility subsection
+	sig = (2*sigma)*(i/99) + 1e-6
+
+	for j in range(100): #Price subsection
+		K = (K_max - K_min)*(j/99) + K_min
+
+		c[i][j] = Model.call_price_pless(s0, K, mu, sig, T)
+
+X = (np.arange(100)/100)*(2*sigma)
+Y = (np.arange(100)/100)*(K_max - K_min) + K_min
+
+x, y = np.meshgrid(Y, X)
+
+plt.clf()
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.plot_surface(x, y, c)
+ax.set_title(ticker)
+ax.set_ylabel('$\sigma$')
+ax.set_xlabel('$K$')
+ax.set_zlabel('Price')
+plt.show()
+
+print(Model.call_price_pless(s0, 555, mu, sigma, T))
 
 
