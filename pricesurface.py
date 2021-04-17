@@ -21,6 +21,9 @@ log_return = np.log(np.array(return_distr) + 1)
 
 #We will use these parameters to solve for call price
 mu = np.mean(log_return)
+
+#Override mu.. assume martingality
+mu = 0.0
 sigma = np.std(log_return)
 
 #Create Surface
@@ -30,7 +33,7 @@ for i in range(100): #Strike subsection
 	K = (K_max - K_min)*(i/99) + K_min
 
 	for j in range(100): #Time subsection
-		t = T*(j/99) + 1e-6
+		t = T*(j/99)
 		c[i][j] = Model.call_price_pless(s0, K, mu, sigma, t)
 
 X = (np.arange(100)/100)*(K_max - K_min) + K_min
@@ -57,12 +60,12 @@ for i in range(100): #Volatility subsection
 	sig = (2*sigma)*(i/99) + 1e-6
 
 	for j in range(100): #Price subsection
-		K = (K_max - K_min)*(j/99) + K_min
+		t = T*(j/99)
 
-		c[i][j] = Model.call_price_pless(s0, K, mu, sig, T)
+		c[i][j] = Model.call_price_pless(s0, 555, mu, sig, t)
 
 X = (np.arange(100)/100)*(2*sigma)
-Y = (np.arange(100)/100)*(K_max - K_min) + K_min
+Y = (np.arange(100)/100)*(T)
 
 x, y = np.meshgrid(Y, X)
 
@@ -70,9 +73,9 @@ plt.clf()
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 ax.plot_surface(x, y, c)
-ax.set_title(ticker)
+ax.set_title(ticker + " $555 Call")
 ax.set_ylabel('$\sigma$')
-ax.set_xlabel('$K$')
+ax.set_xlabel('$t$')
 ax.set_zlabel('Price')
 plt.show()
 
